@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Task Scheduler</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+<header>
+
+    <h1>📅 Task Scheduler</h1>
+
+    <p>Manage your daily tasks efficiently</p>
+
+</header>
+
+<section class="dashboard">
+
+    <div class="card">
+        <h2>Total Tasks</h2>
+        <h1>{{ tasks|length }}</h1>
+    </div>
+
+    <div class="card">
+        <h2>Completed</h2>
+        <h1>{{ tasks|selectattr('completed')|list|length }}</h1>
+    </div>
+
+    <div class="card">
+        <h2>Pending</h2>
+        <h1>{{ tasks|rejectattr('completed')|list|length }}</h1>
+    </div>
+
+</section>
+
+<section class="form-section">
+
+    <h2>Add New Task</h2>
+
+    <form action="/add" method="POST">
+
+        <input
+            type="text"
+            name="title"
+            placeholder="Task Title"
+            required>
+
+        <textarea
+            name="description"
+            placeholder="Task Description"
+            required></textarea>
+
+        <select name="priority">
+
+            <option>High</option>
+            <option>Medium</option>
+            <option>Low</option>
+
+        </select>
+
+        <input
+            type="date"
+            name="date"
+            required>
+
+        <button type="submit">
+            Add Task
+        </button>
+
+    </form>
+
+</section>
+
+<section class="tasks">
+
+    <h2>Your Tasks</h2>
+
+    {% if tasks %}
+
+        {% for task in tasks %}
+
+        <div class="task-card">
+
+            <h3>{{ task.title }}</h3>
+
+            <p>{{ task.description }}</p>
+
+            <p>
+
+                <strong>Priority:</strong>
+
+                {% if task.priority=="High" %}
+
+                    <span class="priority high">
+                        High
+                    </span>
+
+                {% elif task.priority=="Medium" %}
+
+                    <span class="priority medium">
+                        Medium
+                    </span>
+
+                {% else %}
+
+                    <span class="priority low">
+                        Low
+                    </span>
+
+                {% endif %}
+
+            </p>
+
+            <p>
+
+                <strong>Due Date:</strong>
+
+                {{ task.date }}
+
+            </p>
+
+            <p>
+
+                <strong>Status:</strong>
+
+                {% if task.completed %}
+
+                    ✅ Completed
+
+                {% else %}
+
+                    ⏳ Pending
+
+                {% endif %}
+
+            </p>
+
+            <div class="buttons">
+
+                {% if not task.completed %}
+
+                    <a href="/complete/{{ loop.index0 }}">
+                        Complete
+                    </a>
+
+                {% endif %}
+
+                <a href="/edit/{{ loop.index0 }}">
+                    Edit
+                </a>
+
+                <a href="/delete/{{ loop.index0 }}">
+                    Delete
+                </a>
+
+            </div>
+
+        </div>
+
+        {% endfor %}
+
+    {% else %}
+
+        <h3 class="empty">
+
+            No Tasks Added Yet
+
+        </h3>
+
+    {% endif %}
+
+</section>
+
+<script src="{{ url_for('static', filename='script.js') }}"></script>
+
+</body>
+</html>
